@@ -1,0 +1,50 @@
+name: Create Archive
+on:
+  # [push]
+  push:
+    tags:
+      - '*.*.*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+
+      - name: Cache Composer dependencies
+        uses: actions/cache@v2
+        with:
+          path: /tmp/composer-cache
+          key: ${{ runner.os }}-${{ hashFiles('**/composer.lock') }}
+
+      - uses: php-actions/composer@v6
+        with:
+          php_version: '7.4'
+          args: --optimize-autoloader --no-dev --ignore-platform-reqs
+
+      - name: Get the version
+        id: get_version
+        run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
+
+      - name: Build Artifact
+        run: |
+          sed -i -e "s/__STABLE_TAG__/$VERSION/g" "${{ github.workspace }}/plugin-base.php"
+          sed -i -e "s/__STABLE_TAG__/$VERSION/g" "${{ github.workspace }}/readme.txt"
+          rm -rf "${{ github.workspace }}/bin"
+        env:
+          VERSION: ${{ steps.get_version.outputs.VERSION }}
+
+      - name: Archive Release
+        uses: thedoctor0/zip-release@main
+        with:
+          type: 'zip'
+          filename: plugin-base.zip
+          exclusions: '*.git* /*node_modules/* /.editorconfig /docker-compose.yml /composer.lock /composer.json /.phpcs.xml.dist /theme/* /tests/* /bin/* /.docker/* /.devcontainer/* /output.log /docker_tag /DOCKER_ENV'
+
+      - name: GitHub Release
+        uses: ncipollo/release-action@v1
+        with:
+          artifacts: plugin-base.zip
+          tag: ${{ env.VERSION }}
+        env:
+          VERSION: ${{ steps.get_version.outputs.VERSION }}

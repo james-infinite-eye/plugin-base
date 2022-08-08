@@ -1,0 +1,63 @@
+version: "3"
+volumes:
+  node_modules:
+  vendor:
+  php_data:
+  mysql_data:
+  mailcatcher_data:
+services:
+  db:
+    image: mysql:5.7
+    volumes:
+      - "mysql_data:/var/lib/mysql"
+    command: "--max_allowed_packet=500M"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: wordpress
+      MYSQL_USER: wp_user
+      MYSQL_PASSWORD: pass
+    expose:
+      - "3306"
+    ports:
+      - "3306:3306"
+  mailcatcher:
+    build: .docker/mailcatcher
+    volumes:
+      - "mailcatcher_data:/data"
+    ports:
+      - "1025:1025"
+      - "1080:1080"
+  php:
+    build:
+      context: .docker/wordpress
+    depends_on:
+      - db
+    links:
+      - db
+    volumes:
+      - "php_data:/var/www/html"
+      - ".:/var/www/html/wp-content/plugins/plugin-base"
+      - "vendor:/var/www/html/wp-content/plugins/plugin-base/vendor"
+    ports:
+      - "80:80"
+      - "443:443"
+      # - "3000:3000"
+      - "9003:9003"
+    expose:
+      - "9003"
+    environment:
+      WORDPRESS_DB_HOST: db:3306
+      WORDPRESS_DB_USER: wp_user
+      WORDPRESS_DB_PASSWORD: pass
+  adminer:
+    build: .docker/adminer
+    depends_on:
+      - db
+    links:
+      - db
+    ports:
+      - 8081:8080
+  cron1:
+    build: .docker/cron
+    links:
+      - php

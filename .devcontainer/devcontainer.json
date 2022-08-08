@@ -1,0 +1,50 @@
+{
+    "dockerComposeFile": [
+        "../docker-compose.yml"
+    ],
+    "service": "php",
+    "workspaceFolder": "/var/www/html",
+    "extensions": [
+        "felixfbecker.php-debug",
+        "bmewburn.vscode-intelephense-client",
+        "esbenp.prettier-vscode",
+        "jawandarajbir.react-vscode-extension-pack",
+        "neilbrayfield.php-docblocker",
+        "gruntfuggly.todo-tree",
+        "hbenl.vscode-test-explorer",
+        "recca0120.vscode-phpunit"
+    ],
+    "settings": {
+        "editor.formatOnSave": true,
+        "eslint.packageManager": "yarn",
+        "eslint.alwaysShowStatus": true,
+        "npm.includeDirectories": [
+            "wp-content/plugins/plugin-base"
+        ],
+        "npm.useRootDirectory": false,
+        "npm.bin": "yarn",
+        "npm.runInTerminal": true,
+        "prettier.singleQuote": true,
+        "editor.fontLigatures": true,
+        "editor.fontFamily": "Fira Code Light",
+        "editor.fontSize": 12,
+        "todo-tree.highlights.defaultHighlight": {
+            "type": "tag",
+            "foreground": "white",
+            "background": "#2bda2b",
+            "opacity": 50,
+            "iconColour": "#2bda2b"
+        },
+        "phpunit.phpunit": "/var/www/html/wp-content/plugins/plugin-base/vendor/bin/phpunit",
+        "phpunit.files": "/var/www/html/wp-content/plugins/plugin-base/tests/unit-tests/**/*Test.php",
+        "phpunit.args": [
+            "-c/var/www/html/wp-content/plugins/plugin-base/phpunit.xml.dist"
+        ],
+        "files.exclude": {
+            "/var/www/html/wp-content/plugins/plugin-base/build/*": true
+        },
+        "intelephense.environment.includePaths": [
+            "/tmp/wordpress-tests-lib/"
+        ]
+    }
+}
